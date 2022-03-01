@@ -3,8 +3,15 @@
 # 
 # Defining a few variables...
 #
+LATEXMAIN_FILE=$2
+LATEXDOC_DIR=$1
+if [ -z "$LATEXMAIN_FILE" ]; then
+        LATEXMAIN_FILE="/home/javi/Nextcloud/Universidad/Master/TFM/ST_analysis/Documentacion/Introduccion_series_temporales.tex"
+fi
+if [ -z "$LATEXDOC_DIR" ]; then
+          LATEXDOC_DIR="/home/javi/Nextcloud/Universidad/Master/TFM/ST_analysis/Documentacion/chapters"
+fi
 LATEXCMD="/usr/bin/pdflatex"
-LATEXDOC_DIR="/home/javi/Nextcloud/Universidad/Master/TFM/Documentacion"
 MD5SUMS_FILE="$LATEXDOC_DIR/md5.sum"
 
 #
@@ -29,6 +36,7 @@ update_file()
 
         # Calling the compiler.
         "$LATEXCMD" -output-directory $(dirname "$file") "$file" > /dev/null
+        "$LATEXCMD" -output-directory $(dirname "$LATEXMAIN_FILE") "$LATEXMAIN_FILE" > /dev/null
         LTX=$?
 
         # There was no "old MD5", the file is new. Add its hash to $MD5SUMS_FILE.
@@ -36,7 +44,7 @@ update_file()
             echo "$NEW_MD5 $file" >> "$MD5SUMS_FILE"
         # There was an "old MD5", let's use sed to replace it.
         elif [ $LTX -eq 0 ]; then
-            sed "s|^.*\b$OLD_MD5\b.*$|$NEW_MD5 $file|" "$MD5SUMS_FILE" -i
+            sed 's|^.*\b$OLD_MD5\b.*$|$NEW_MD5 $file|' "$MD5SUMS_FILE" -i
         fi
     fi
 }
